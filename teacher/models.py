@@ -1,10 +1,10 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.db import models
-from student.models import *
+from student.models import Item, AcademicYear, Level, Student
 
 
 class Teacher(models.Model):
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=24)
 
     class Degree(models.IntegerChoices):
@@ -14,7 +14,7 @@ class Teacher(models.Model):
         OTHER = 2
 
     degree = models.IntegerField(choices=Degree.choices, default=-1)
-    items = models.ManyToManyField(Item, through='TeacherItemYear', related_name='teacher_items')
+    items = models.ManyToManyField(Item, through='TeacherItemYear', related_name='teachers')
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
@@ -27,11 +27,11 @@ class TeacherItemYear(models.Model):
 
 
 class Rating(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='ratings')
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='ratings')
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='ratings')
     date = models.DateField()
-    value = models.DecimalField(max_digits=3, decimal_places=1)
+    value = models.DecimalField(max_digits=2, decimal_places=1)
 
     def __str__(self):
         return f"{self.student} {self.date}: {self.value}"
