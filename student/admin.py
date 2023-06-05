@@ -13,6 +13,7 @@ class UserCreateForm(UserCreationForm):
 
 
 class UserAdmin(UserAdmin):
+    ordering = ['last_name']
     add_form = UserCreateForm
     prepopulated_fields = {'username': ('email',)}
 
@@ -38,13 +39,10 @@ class StudentAdmin(admin.ModelAdmin):
         return obj.user.first_name + ' ' + obj.user.last_name
 
 
-
-
 admin.site.register(AcademicYear)
 admin.site.register(Level)
 admin.site.register(Item)
 admin.site.register(StudentItemYear)
-
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Student|Reunion detail 2
+{% endblock %}
+{% block content %}
+<h3>Lessons for reunion from {{ reunion.start_at }} to {{ reunion.finish_at }}:</h3>
+<table class="table">
+
+    {% for lesson in reunion.lessons.all|dictsortreversed:'date_time' %}
+        <thead class="thead-dark">
+            <tr class="table-dark">
+                 <th scope="col" colspan="4">{{ lesson.item }}</th>
+            </tr>
+            <tr class="table-primary">
+                 <th scope="col" colspan="4">{{ lesson.teacher }}</th>
+            </tr>
+            <tr class="table-secondary">
+                 <th scope="col" colspan="4">{{ lesson.topic }}</th>
+            </tr>
+            <tr>
+                <th></th>
+                <th>Date Time</th>
+                <th>Localization</th>
+                <th>References</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <tr>
+                <th scope="row"></th>
+                <td>{{ lesson.date_time }}</td>
+                <td>{{ lesson.localization }}<br />{{ lesson.localization.address }}</td>
+                {% if lesson.references %}
+                <td><a href="{{ MEDIA_URL }}{{ lesson.references }}" download>DOWNLOAD</a></td>
+                {% else %}
+                <td></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

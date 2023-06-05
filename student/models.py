@@ -2,6 +2,13 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
+def get_full_name(self):
+    return self.username + ': ' + self.first_name + " " + self.last_name
+
+
+User.add_to_class("__str__", get_full_name)
+
+
 class Student(models.Model):
     class Confession(models.IntegerChoices):
         NOT_DEFINED = -1
@@ -22,11 +29,12 @@ class Student(models.Model):
     phone = models.CharField(max_length=24)
     birth_date = models.DateField()
     confession = models.IntegerField(choices=Confession.choices, default=-1)
+    education = models.IntegerField(choices=Education.choices, default=-1)
     address = models.TextField(blank=True)
     workplace = models.TextField(blank=True)
     comments = models.TextField(blank=True);
-    index = models.CharField(max_length=24, blank=True)
-    diploma = models.CharField(max_length=24, blank=True)
+    index = models.CharField(max_length=24, blank=True, unique=True)
+    diploma = models.CharField(max_length=24, blank=True, unique=True)
     level = models.ForeignKey('Level', related_name='students', on_delete=models.CASCADE)
 
     def __str__(self):
@@ -67,3 +75,9 @@ class StudentItemYear(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('student', 'item', 'academic_year',)
+
+    def __str__(self):
+        return self.student.user.first_name + " " + self.student.user.last_name + " " + " " + self.item.name + " " + self.academic_year.name

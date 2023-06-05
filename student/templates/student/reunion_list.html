@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load student_extras %}
+
+{% block title %}
+    Student|Reunions
+{% endblock %}
+
+{% block content %}
+    <h2>Reunions for your level in this academic year:</h2>
+    <ul class="list-group">
+    {% for reunion in reunions|dictsortreversed:"start_at" %}
+        <li class="list-group-item"><a href="{% url 'student:reunion-detail' pk=reunion.id %}">{{ reunion.academic_year }} - {{ reunion.start_at }} - {{ reunion.finish_at }}</a></li>
+        {% empty %}
+        <li class="list-group-item">No reunions found.</li>
+    {% endfor %}
+    </ul>
+
+{% endblock %}
