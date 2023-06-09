@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load teacher_extras %}
+
+{% block title %}
+    Student|Home
+{% endblock %}
+
+{% block content %}
+
+    <h1>Your students by items with their ratings:</h1>
+
+    {% for item in items %}
+        <table class="table table-sm">
+
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col" colspan="4">{{ item.name }}</th>
+            </tr>
+
+            <tr>
+                <th>FIRST NAME</th>
+                <th colspan="2">SECOND NAME</th>
+                <th>NOT PRESENT</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {% for student in students %}
+                {% if student.item.pk == item.pk %}
+                    <tr class="table-warning">
+                        <td>{{ student.user.first_name }}</td>
+                        <td colspan="2">{{ student.user.last_name }}</td>
+                        <td>{{ student.item.not_present }}</td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <th colspan="4">RATINGS</th>
+                </tr>
+                <tr>
+                    <th>DATE</th>
+                    <th>VALUE</th>
+                    <th>NOTICE</th>
+                    <th></th>
+                </tr>
+                {% for rating in ratings|for_student:student %}
+                    <tr>
+                        <td>{{ rating.date }}</td>
+                        <td>{{ rating.value }}</td>
+                        <td>{{ rating.notice }}</td>
+                        <td><a href="{% url 'teacher:rating-update'  pk=rating.id %}">
+                            <button class="btn btn-danger btn-sm">EDIT</button>
+                        </a></td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+
+    {% endfor %}
+
+{% endblock %}

@@ -23,6 +23,7 @@ from config import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('student.urls')),
+    path('teacher/', include('teacher.urls')),
     path('', include('django.contrib.auth.urls')),
 
 ]

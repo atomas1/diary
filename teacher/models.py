@@ -53,7 +53,7 @@ class Lesson(models.Model):
     topic = models.CharField(max_length=128)
     date_time = models.DateTimeField()
     references = models.FileField(upload_to="student", blank=True)
-    teacher=models.ForeignKey(Teacher,on_delete=models.CASCADE, related_name='lessons')
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='lessons')
 
     def __str__(self):
         return f"{self.item} - {self.topic}"

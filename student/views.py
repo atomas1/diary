@@ -26,6 +26,7 @@ def home(request):
     except AttributeError:
         try:
             is_teacher = request.user.teacher.degree
+            request.session['is_student'] = False
             request.session['is_teacher'] = True
             return redirect(reverse('teacher:home'))
         except AttributeError:

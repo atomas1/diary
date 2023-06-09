@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Student|Reunion detail 2
+{% endblock %}
+{% block content %}
+    <h3>Lessons where You are the teacher: <a style="float:right;" href="{% url 'teacher:lesson-create' %}">
+        <button class="btn btn-danger btn-sm">CREATE LESSON</button>
+    </a></h3>
+    <table class="table">
+
+        {% for lesson in lessons|dictsortreversed:'date_time' %}
+            <thead class="thead-dark">
+            <tr class="table-dark">
+                <th scope="col" colspan="4">{{ lesson.item }}</th>
+            </tr>
+            <tr class="table-secondary">
+                <th scope="col" colspan="4">{{ lesson.topic }}</th>
+            </tr>
+            <tr>
+                <th>DATE TIME</th>
+                <th>Localization</th>
+                <th>References</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr>
+                <th scope="row">{{ lesson.date_time }}</th>
+                <td>{{ lesson.localization }}<br/>{{ lesson.localization.address }}</td>
+                {% if lesson.references %}
+                    <td><a href="{{ MEDIA_URL }}{{ lesson.references }}" download>DOWNLOAD</a></td>
+                {% else %}
+                    <td></td>
+                {% endif %}
+                <td><a href="{% url 'teacher:lesson-update' pk=lesson.id %}">
+                    <button class="btn btn-sm btn-danger">UPDATE</button>
+                </a></td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <div class="accordion" id="accordion{{ forloop.counter }}">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="true"
+                                        aria-controls="collapseOne">
+                                    Present students:
+                                </button>
+                            </h2>
+                            <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse"
+                                 aria-labelledby="heading{{ forloop.counter }}"
+                                 data-bs-parent="#accordion{{ forloop.counter }}">
+                                <div class="accordion-body">
+                                    {% for student in lesson.present_students.all|dictsort:'user.last_name' %}
+                                        <p>{{ student.user.first_name }} {{ student.user.last_name }}</p>
+                                    {% empty %}
+                                        <p>There is no student present yet</p>
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
