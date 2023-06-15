@@ -1,7 +1,7 @@
 from django.forms import DateInput, DateTimeInput
 from django.forms import ModelForm
 
-from .models import Rating, Lesson
+from .models import Rating, Lesson, Exam
 
 
 class DateInput(DateInput):
@@ -41,3 +41,12 @@ class LessonUpdateForm(ModelForm):
             'date_time': DateTimeInput(),
         }
 
+
+class ExamForm(ModelForm):
+    class Meta:
+        model = Exam
+        fields = (
+            'academic_year', 'localization', 'date_time', 'item', 'students')
+        widgets = {
+            'date_time': DateTimeInput(),
+        }

@@ -24,12 +24,23 @@
 
 <div class="container mt-3 mb-5">
     <div class="row">
-        <div class="col-8">
+        <div class="col-sm-12 col-lg-8">
             {% block content %}{% endblock %}
         </div>
-        <div class="col-4">
+        <div class="col-sm-12 col-lg-4">
             {% block aside %}
-                <h2>Z base pochodzę</h2>
+
+                <h5>You are logged as:</h5>
+                <p>{{ user.first_name }} {{ user.last_name }}</p>
+                <p>Email: {{ user.email }}</p>
+                {% if is_teacher %}
+                    <p>Your role: TEACHER</p>
+                    <p>Phone: {{ user.teacher.phone }}</p>
+                {% endif %}
+                {% if is_student %}
+                    <p>Your role: STUDENT</p>
+                    <p>Phone: {{ user.student.phone }}</p>
+                {% endif %}
             {% endblock %}
         </div>
     </div>

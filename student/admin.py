@@ -1,28 +1,6 @@
 from django.contrib import admin
-from django.contrib.auth.models import User
 
-from .models import *
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.forms import UserCreationForm
-
-
-class UserCreateForm(UserCreationForm):
-    class Meta:
-        model = User
-        fields = ('username', 'first_name', 'last_name', 'email')
-
-
-class UserAdmin(UserAdmin):
-    ordering = ['last_name']
-    add_form = UserCreateForm
-    prepopulated_fields = {'username': ('email',)}
-
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('first_name', 'last_name', 'email', 'username', 'password1', 'password2'),
-        }),
-    )
+from .models import Student, AcademicYear, Level, Item, StudentItemYear
 
 
 @admin.register(Student)
@@ -43,6 +21,3 @@ admin.site.register(AcademicYear)
 admin.site.register(Level)
 admin.site.register(Item)
 admin.site.register(StudentItemYear)
-
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)

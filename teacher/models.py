@@ -1,10 +1,10 @@
-from django.contrib.auth.models import User
 from django.db import models
+from django.conf import settings
 from student.models import Item, AcademicYear, Level, Student
 
 
 class Teacher(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     phone = models.CharField(max_length=24)
 
     class Degree(models.IntegerChoices):
@@ -91,7 +91,7 @@ class Exam(models.Model):
 class StudentExam(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
-    rating = models.DecimalField(max_digits=3, decimal_places=2)
+    rating = models.DecimalField(max_digits=3, decimal_places=2, null=True)
     is_passed = models.BooleanField(default=False)
 
     class Meta:

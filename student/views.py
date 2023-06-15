@@ -1,23 +1,23 @@
-from datetime import datetime
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.views import View
-from django.http import HttpResponse
+from django.views.generic import ListView, DetailView
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from config import settings
+from django.conf import settings
+
 from teacher.models import Rating, Exam, StudentExam, Reunion
 from .models import AcademicYear, Item
-from django.views.generic import ListView, DetailView
 
 
 # Create your views here.
 def home(request):
     try:
-        current_academic_year = AcademicYear.objects.filter(started_at__lt=datetime.today()).filter(
-            finished_at__gt=datetime.today()).first()
-        request.session['current_academic_year'] = current_academic_year.name
+        current_academic_year = AcademicYear.objects.all().order_by('-started_at').first()
+        if current_academic_year:
+            request.session['current_academic_year'] = current_academic_year.name
+        else:
+            request.session['current_academic_year'] = "No academic year selected"
         is_student = request.user.student.level
         request.session['is_student'] = True
         request.session['is_teacher'] = False
@@ -58,7 +58,7 @@ class ReunionsView(LoginRequiredMixin, ListView):
         return queryset
 
     def get_context_data(self, *args, **kwargs):
-        context = super(ReunionsView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['is_student'] = self.request.session.get('is_student')
         return context
 
@@ -68,8 +68,10 @@ class ReunionsView(LoginRequiredMixin, ListView):
 class ReunionDetailView(LoginRequiredMixin, DetailView):
     model = Reunion
     template_name = 'student/reunion_details.html'
+
     def get_context_data(self, *args, **kwargs):
-        context = super(ReunionDetailView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['is_student'] = self.request.session.get('is_student')
         return context
+
     context_object_name = 'reunion'

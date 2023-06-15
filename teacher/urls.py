@@ -11,4 +11,8 @@ urlpatterns = [
     path('lessons/', views.TeacherLessonsView.as_view(), name='lessons'),
     path('rating/<int:pk>/', views.RatingUpdateView.as_view(), name='rating-update'),
     path('lesson/<int:pk>/', views.LessonUpdateView.as_view(), name='lesson-update'),
+    path('exam/<int:pk>/', views.ExamUpdateView.as_view(), name='exam-update'),
+    path('exam/', views.ExamCreateView.as_view(), name='exam-create'),
+    path('exams/', views.TeacherExamsView.as_view(), name='exams'),
+    path('exam/rating/<int:pk>/', views.ExamRatingUpdate.as_view(), name='exam-rating-update'),
 ]

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Student|Reunion detail 2
+{% endblock %}
+{% block content %}
+    <h3>Exams of items where You are a teacher: <a style="float:right;" href="{% url 'teacher:exam-create' %}">
+        <button class="btn btn-danger btn-sm">CREATE EXAM</button>
+    </a></h3>
+    <table class="table">
+
+        {% for exam in exams|dictsortreversed:'date_time' %}
+            <thead class="thead-dark">
+            <tr class="table-dark">
+                <th scope="col" colspan="4">{{ exam.item }}</th>
+            </tr>
+
+            <tr>
+                <th>DATE TIME</th>
+                <th>Localization</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr>
+                <th scope="row">{{ exam.date_time }}</th>
+                <td>{{ exam.localization }}<br/>{{ exam.localization.address }}</td>
+                <td><a href="{% url 'teacher:exam-update' pk=exam.id %}">
+                    <button class="btn btn-sm btn-danger">UPDATE EXAM</button>
+                </a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <div class="accordion" id="accordion{{ forloop.counter }}">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="true"
+                                        aria-controls="collapse{{ forloop.counter }}">
+                                    Students accessed to exam:
+                                </button>
+                            </h2>
+                            <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse"
+                                 aria-labelledby="heading{{ forloop.counter }}"
+                                 data-bs-parent="#accordion{{ forloop.counter }}">
+                                <div class="accordion-body">
+                                    {% for student in exam.students.all|dictsort:'user.last_name' %}
+                                        <table class="table table-sm">
+                                            <thead><th>Student</th><th>RATING</th><th></th></thead>
+                                            {% for studentexam in student.studentexam_set.all %}
+                                                {% if studentexam.exam.pk == exam.pk %}
+                                                    <tr>
+                                                        <td>{{ student.user.first_name }} {{ student.user.last_name }}</td>
+                                                        <td>{{ studentexam.rating }}</td>
+                                                        <td>
+                                                            <a href="{% url 'teacher:exam-rating-update' pk=studentexam.pk %}">
+                                                                <button class="btn btn-sm-sm btn-danger">UPDATE RATING
+                                                                </button>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </table>
+                                    {% empty %}
+                                        <p>There is no student accessed yet</p>
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

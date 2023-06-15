@@ -1,12 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.forms import DateInput, ModelMultipleChoiceField, SelectMultiple
+from django.db.models import Q
+from django.forms import ModelMultipleChoiceField, SelectMultiple
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, UpdateView
 
-from .forms import RatingForm, LessonForm, LessonUpdateForm
-from .models import Rating, Teacher, Lesson
+from .forms import RatingForm, LessonForm, LessonUpdateForm, ExamForm
+from .models import Rating, Teacher, Lesson, Exam, StudentExam
 from student.models import Item, Student, AcademicYear
 
 
@@ -17,15 +18,16 @@ class Home(LoginRequiredMixin, View):
         current_academic_year = AcademicYear.objects.filter(
             name=self.request.session.get('current_academic_year')).first()
         items = Item.objects.filter(
-            teachers__in=[self.request.user.teacher]).filter(academicyears__in=[current_academic_year]).order_by(
+            Q(teachers__in=[self.request.user.teacher]) & Q(academicyears__in=[current_academic_year])).order_by(
             'name')
         students = []
         for item in items:
-            for student in item.students.filter(academic_years__in=[current_academic_year]).order_by('user__last_name'):
+            for student in item.students.filter(academic_years__in=[current_academic_year]).order_by(
+                    'user__last_name'):
                 student.item = item
                 student.item.not_present = item.lessons.filter(
                     reunion__academic_year=current_academic_year).count() - Lesson.objects.filter(item=item).filter(
-                    reunion__academic_year=current_academic_year).filter(present_students__in=[student]).count()
+                    present_students__in=[student]).count()
                 students.append(student)
         ratings = Rating.objects.filter(item__in=items).filter(teacher=request.user.teacher)
         return render(request, 'teacher/home.html',
@@ -52,7 +54,7 @@ class RatingCreateView(LoginRequiredMixin, CreateView):
         return form
 
     def get_context_data(self, *args, **kwargs):
-        context = super(RatingCreateView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['is_teacher'] = self.request.session.get('is_teacher')
         return context
     # login_url = reverse_lazy('users:login')
@@ -67,7 +69,7 @@ class LessonCreateView(LoginRequiredMixin, CreateView):
     def get_form(self, *args, **kwargs):
         current_academic_year = AcademicYear.objects.filter(
             name=self.request.session.get('current_academic_year')).first()
-        form = super(LessonCreateView, self).get_form(*args, **kwargs)
+        form = super().get_form(*args, **kwargs)
         items = Item.objects.filter(
             teachers__in=[self.request.user.teacher]).filter(academicyears__in=[current_academic_year]).order_by(
             'name')
@@ -76,7 +78,7 @@ class LessonCreateView(LoginRequiredMixin, CreateView):
         return form
 
     def get_context_data(self, *args, **kwargs):
-        context = super(LessonCreateView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['is_teacher'] = self.request.session.get('is_teacher')
         return context
 
@@ -90,7 +92,7 @@ class RatingUpdateView(LoginRequiredMixin, UpdateView):
     def get_form(self, *args, **kwargs):
         current_academic_year = AcademicYear.objects.filter(
             name=self.request.session.get('current_academic_year')).first()
-        form = super(RatingUpdateView, self).get_form(*args, **kwargs)
+        form = super().get_form(*args, **kwargs)
         items = Item.objects.filter(
             teachers__in=[self.request.user.teacher]).filter(academicyears__in=[current_academic_year]).order_by(
             'name')
@@ -101,7 +103,7 @@ class RatingUpdateView(LoginRequiredMixin, UpdateView):
         return form
 
     def get_context_data(self, *args, **kwargs):
-        context = super(RatingUpdateView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['is_teacher'] = self.request.session.get('is_teacher')
         return context
 
@@ -118,14 +120,14 @@ class TeacherLessonsView(LoginRequiredMixin, View):
 
 class LessonUpdateView(LoginRequiredMixin, UpdateView):
     model = Lesson
-    form_class = LessonForm
+    form_class = LessonUpdateForm
     template_name = 'teacher/lesson_create.html'
     success_url = reverse_lazy('teacher:lessons')
 
     def get_form(self, *args, **kwargs):
         current_academic_year = AcademicYear.objects.filter(
             name=self.request.session.get('current_academic_year')).first()
-        form = super(LessonUpdateView, self).get_form(*args, **kwargs)
+        form = super().get_form(*args, **kwargs)
         items = Item.objects.filter(
             teachers__in=[self.request.user.teacher]).filter(academicyears__in=[current_academic_year]).order_by(
             'name')
@@ -137,6 +139,94 @@ class LessonUpdateView(LoginRequiredMixin, UpdateView):
         return form
 
     def get_context_data(self, *args, **kwargs):
-        context = super(LessonUpdateView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
+        context['is_teacher'] = self.request.session.get('is_teacher')
+        return context
+
+
+class ExamCreateView(LoginRequiredMixin, CreateView):
+    model = Exam
+    form_class = ExamForm
+    template_name = 'teacher/exam_create.html'
+    success_url = reverse_lazy('teacher:lessons')
+
+    def get_form(self, *args, **kwargs):
+        current_academic_year = AcademicYear.objects.filter(
+            name=self.request.session.get('current_academic_year')).first()
+        form = super().get_form(*args, **kwargs)
+        items = Item.objects.filter(
+            teachers__in=[self.request.user.teacher]).filter(academicyears__in=[current_academic_year]).order_by(
+            'name')
+        students = Student.objects.filter(items__in=items).filter(academic_years__in=[current_academic_year]).order_by(
+            'user__last_name')
+        form.fields['academic_year'].queryset = AcademicYear.objects.filter(pk=current_academic_year.pk)
+        form.fields['item'].queryset = items
+        form.fields['students'].queryset = students
+        return form
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_teacher'] = self.request.session.get('is_teacher')
+        return context
+
+
+class ExamUpdateView(LoginRequiredMixin, UpdateView):
+    model = Exam
+    form_class = ExamForm
+    template_name = 'teacher/exam_create.html'
+    success_url = reverse_lazy('teacher:lessons')
+
+    def get_form(self, *args, **kwargs):
+        current_academic_year = AcademicYear.objects.filter(
+            name=self.request.session.get('current_academic_year')).first()
+        form = super().get_form(*args, **kwargs)
+        items = Item.objects.filter(
+            teachers__in=[self.request.user.teacher]).filter(academicyears__in=[current_academic_year]).order_by(
+            'name')
+        students = Student.objects.filter(items__in=items).filter(academic_years__in=[current_academic_year]).order_by(
+            'user__last_name')
+        form.fields['academic_year'].queryset = AcademicYear.objects.filter(pk=current_academic_year.pk)
+        form.fields['item'].queryset = items
+        form.fields['students'].queryset = students
+        return form
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_teacher'] = self.request.session.get('is_teacher')
+        return context
+
+
+class TeacherExamsView(LoginRequiredMixin, View):
+    def get(self, request):
+        current_academic_year = AcademicYear.objects.filter(
+            name=self.request.session.get('current_academic_year')).first()
+        items = Item.objects.filter(
+            teachers__in=[self.request.user.teacher]).filter(academicyears__in=[current_academic_year]).order_by(
+            'name')
+        exams = Exam.objects.filter(academic_year=current_academic_year).filter(item__in=items).order_by('-date_time')
+        is_teacher = self.request.session.get('is_teacher')
+        return render(request, 'teacher/exams.html', context={'exams': exams, 'is_teacher': is_teacher})
+
+
+class ExamRatingUpdate(LoginRequiredMixin, UpdateView):
+    model = StudentExam
+    fields = ['student', 'exam', 'rating', 'is_passed']
+    template_name = 'teacher/exam_create.html'
+    success_url = reverse_lazy('teacher:exams')
+
+    def get_form(self, *args, **kwargs):
+        current_academic_year = AcademicYear.objects.filter(
+            name=self.request.session.get('current_academic_year')).first()
+        form = super().get_form(*args, **kwargs)
+        items = Item.objects.filter(
+            teachers__in=[self.request.user.teacher]).filter(academicyears__in=[current_academic_year]).order_by(
+            'name')
+        students = Student.objects.filter(items__in=items).filter(academic_years__in=[current_academic_year]).order_by(
+            'user__last_name')
+        form.fields['student'].queryset = students
+        return form
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         context['is_teacher'] = self.request.session.get('is_teacher')
         return context

@@ -1,12 +1,5 @@
-from django.contrib.auth.models import User
 from django.db import models
-
-
-def get_full_name(self):
-    return self.username + ': ' + self.first_name + " " + self.last_name
-
-
-User.add_to_class("__str__", get_full_name)
+from django.conf import settings
 
 
 class Student(models.Model):
@@ -24,7 +17,7 @@ class Student(models.Model):
         PRIMARY = 2
         OTHER = 3
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     academic_years = models.ManyToManyField('AcademicYear', related_name='students')
     phone = models.CharField(max_length=24)
     birth_date = models.DateField()
