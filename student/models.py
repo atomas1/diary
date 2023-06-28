@@ -3,6 +3,7 @@ from django.conf import settings
 
 
 class Student(models.Model):
+    """school student model inherited from the user model"""
     class Confession(models.IntegerChoices):
         NOT_DEFINED = -1
         ROMAN_CATHOLIC = 0
@@ -27,7 +28,7 @@ class Student(models.Model):
     workplace = models.TextField(blank=True)
     comments = models.TextField(blank=True);
     index = models.CharField(max_length=24, blank=True, unique=True)
-    diploma = models.CharField(max_length=24, blank=True, unique=True)
+    diploma = models.CharField(max_length=24, blank=True, unique=False)
     level = models.ForeignKey('Level', related_name='students', on_delete=models.CASCADE)
 
     def __str__(self):
@@ -35,6 +36,7 @@ class Student(models.Model):
 
 
 class AcademicYear(models.Model):
+    """We can manage academic years"""
     name = models.CharField(max_length=12)
     started_at = models.DateField()
     finished_at = models.DateField()
@@ -45,6 +47,7 @@ class AcademicYear(models.Model):
 
 
 class Level(models.Model):
+    """The school has three levels"""
     class LevelNumber(models.IntegerChoices):
         FIRST = 1
         SECOND = 2
@@ -57,6 +60,7 @@ class Level(models.Model):
 
 
 class Item(models.Model):
+    """Model to manage school items"""
     name = models.CharField(max_length=128)
     students = models.ManyToManyField(Student, through='StudentItemYear', related_name='items')
 
@@ -65,11 +69,13 @@ class Item(models.Model):
 
 
 class StudentItemYear(models.Model):
+    """model describing M2M relationship between student, academic years and items """
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)
 
     class Meta:
+        """only one item student pair is possible in given academic year"""
         unique_together = ('student', 'item', 'academic_year',)
 
     def __str__(self):

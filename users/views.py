@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse
+from django.contrib.auth.views import LoginView
+from django.urls import reverse_lazy
 from django.views import View
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
@@ -10,7 +11,17 @@ from student.models import AcademicYear
 from .forms import ChooseAcademicYearForm
 
 
+class CustomLoginView(LoginView):
+    template_name = 'users/login.html'
+    success_url = reverse_lazy('student:home')
+
+    def get_success_url(self):
+        return self.success_url
+
+
+
 class PasswordChange(LoginRequiredMixin, View):
+    """Logged user can change his password"""
     def post(self, request):
         form = PasswordChangeForm(request.user, request.POST)
         is_teacher = self.request.session.get('is_teacher')
@@ -41,6 +52,7 @@ class PasswordChange(LoginRequiredMixin, View):
 
 
 class ChooseAcademicYear(LoginRequiredMixin, View):
+    """Logged user can change current academic year"""
     def post(self, request):
         form = ChooseAcademicYearForm(request.POST)
         if form.is_valid():

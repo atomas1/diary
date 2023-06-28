@@ -4,6 +4,7 @@ from student.models import Item, AcademicYear, Level, Student
 
 
 class Teacher(models.Model):
+    """teachers in shool inherited forom the user model. It is possible the former student to become a teacher"""
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     phone = models.CharField(max_length=24)
 
@@ -21,11 +22,13 @@ class Teacher(models.Model):
 
 
 class TeacherItemYear(models.Model):
+    """Model describing M2M relationship between Teacher and items in given academic year """
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)
 
     class Meta:
+        """only one entry for item to specific teacher in given academic year is possible"""
         unique_together = ('teacher', 'item', 'academic_year')
 
     def __str__(self):
@@ -33,6 +36,7 @@ class TeacherItemYear(models.Model):
 
 
 class Rating(models.Model):
+    """ratings for students"""
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='ratings')
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='ratings')
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='ratings')
@@ -45,6 +49,7 @@ class Rating(models.Model):
 
 
 class Lesson(models.Model):
+    """lessons for item in specific reunion"""
     localization = models.ForeignKey('Localization', on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='lessons')
     level = models.ForeignKey(Level, on_delete=models.CASCADE, related_name='lessons')
@@ -60,6 +65,7 @@ class Lesson(models.Model):
 
 
 class Reunion(models.Model):
+    """weekend's reunions"""
     academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE, related_name="reunions")
     level = models.ForeignKey(Level, on_delete=models.CASCADE, related_name='reunions')
     start_at = models.DateField()
@@ -70,6 +76,7 @@ class Reunion(models.Model):
 
 
 class Localization(models.Model):
+    """Localizations for lessons and exams"""
     name = models.CharField(max_length=128)
     address = models.TextField()
 
@@ -78,6 +85,7 @@ class Localization(models.Model):
 
 
 class Exam(models.Model):
+    """Exams"""
     academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)
     localization = models.ForeignKey(Localization, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='exams')
@@ -89,6 +97,7 @@ class Exam(models.Model):
 
 
 class StudentExam(models.Model):
+    """model describing the M2M relationship beetween student and exam. The rating may be corrected until the exam is marked as passed"""
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
     rating = models.DecimalField(max_digits=3, decimal_places=2, null=True)

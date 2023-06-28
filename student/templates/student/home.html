@@ -6,17 +6,18 @@
 {% endblock %}
 
 {% block content %}
-    <table class="table">
 
     {% for item in items %}
-        <thead class="thead-dark">
+        <table class="table">
+
+            <thead class="thead-dark">
             <tr>
-                 <th scope="col" colspan="4">{{ item.name }}</th>
+                <th scope="col" colspan="4">{{ item.name }}</th>
             </tr>
             {% for teacher in item.teachers.all %}
-            <tr>
-                 <th scope="col" colspan="4">{{ teacher }}</th>
-            </tr>
+                <tr>
+                    <th scope="col" colspan="4">{{ teacher }}</th>
+                </tr>
             {% endfor %}
             <tr>
                 <th></th>
@@ -24,44 +25,44 @@
                 <th>NOTICE</th>
                 <th>TEACHER</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
 
-        {% for rating in ratings|in_item:item %}
-            <tr>
-                <th scope="row">{{ rating.date }}</th>
-                <td>{{ rating.value }}</td>
-                <td>{{ rating.notice }}</td>
-                <td>{{ rating.teacher }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <table class="table">
-
-        {% for exam in exams|in_item:item %}
-        <thead class="thead-light">
-            <tr>
-                 <th scope="col" colspan="3">Exam</th>
-            </tr>
-            <tr>
-                <th></th>
-                <th></th>
-                <th>RATING</th>
-            </tr>
-        </thead>
-        <tbody>
-
-            {% for rating_exam in ratings_exams|in_exam:exam %}
-            <tr>
-                <th scope="row">{{ exam.date_time }}</th>
-                <td>{{ exam.localization }}</td>
-                <td>{{ rating_exam.rating }}</td>
-            </tr>
+            {% for rating in ratings|in_item:item %}
+                <tr>
+                    <th scope="row">{{ rating.date }}</th>
+                    <td>{{ rating.value }}</td>
+                    <td>{{ rating.notice }}</td>
+                    <td>{{ rating.teacher }}</td>
+                </tr>
             {% endfor %}
-        </tbody>
-        {% endfor %}
-    </table>
+            </tbody>
+        </table>
+        <table class="table">
+
+            {% for exam in exams|in_item:item %}
+                <thead class="thead-light">
+                <tr>
+                    <th scope="col" colspan="3">Exam</th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>RATING</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for rating_exam in ratings_exams|in_exam:exam %}
+                    <tr>
+                        <th scope="row">{{ exam.date_time }}</th>
+                        <td>{{ exam.localization }}</td>
+                        <td>{{ rating_exam.rating }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            {% endfor %}
+        </table>
     {% endfor %}
 
 {% endblock %}

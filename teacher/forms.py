@@ -1,5 +1,5 @@
 from django.forms import DateInput, DateTimeInput
-from django.forms import ModelForm
+from django.forms import ModelForm, Form
 
 from .models import Rating, Lesson, Exam
 
@@ -50,3 +50,7 @@ class ExamForm(ModelForm):
         widgets = {
             'date_time': DateTimeInput(),
         }
+
+
+class EmptyForm(Form):
+    pass

@@ -7,7 +7,11 @@
 
 {% block content %}
 
-    <h1>Your students by items with their ratings:</h1>
+    {% if is_teacher %}
+        <h1>Your students by items with their ratings:</h1>
+    {% else %}
+        <h1>You are not a teacher</h1>
+    {% endif %}
 
     {% for item in items %}
         <table class="table table-sm">
@@ -25,14 +29,16 @@
             </thead>
             <tbody>
 
-            {% for student in students %}
-                {% if student.item.pk == item.pk %}
-                    <tr class="table-warning">
-                        <td>{{ student.user.first_name }}</td>
-                        <td colspan="2">{{ student.user.last_name }}</td>
-                        <td>{{ student.item.not_present }}</td>
-                    </tr>
-                {% endif %}
+            {% for student in item.students|for_academic_year:request.session.current_academic_year %}
+                {% for student_item in student.items_p %}
+                    {% if student_item.ide == item.pk %}
+                        <tr class="table-warning">
+                            <td>{{ student.user.first_name }}</td>
+                            <td colspan="2">{{ student.user.last_name }}</td>
+                            <td>{{ student_item.not_present }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
                 <tr>
                     <th colspan="4">RATINGS</th>
                 </tr>

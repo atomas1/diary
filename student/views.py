@@ -12,6 +12,9 @@ from .models import AcademicYear, Item
 
 # Create your views here.
 def home(request):
+    """Default view for all project. It redirects to correct view after successfull login """
+    if not request.user.is_authenticated:
+        return redirect(settings.LOGIN_URL)
     try:
         current_academic_year = AcademicYear.objects.all().order_by('-started_at').first()
         if current_academic_year:
@@ -33,9 +36,14 @@ def home(request):
             return redirect(reverse(settings.LOGIN_URL))
 
 
-class ItemsView(View, LoginRequiredMixin):
+class ItemsView(LoginRequiredMixin, View):
+    """Items of logged student in chosen academic year"""
+
     def get(self, request):
+        # check if user is a student, if not redirect him to login page
         is_student = request.session.get('is_student')
+        if not is_student:
+            return redirect(settings.LOGIN_URL)
         current_academic_year = AcademicYear.objects.filter(name=request.session.get('current_academic_year')).first()
         items = Item.objects.filter(
             Q(academicyears__in=[current_academic_year]) & Q(students__in=[request.user.student])).order_by('name')
@@ -48,6 +56,7 @@ class ItemsView(View, LoginRequiredMixin):
 
 
 class ReunionsView(LoginRequiredMixin, ListView):
+    """reunions in current academic year for logged students"""
     template_name = 'student/reunion_list.html'
 
     def queryset(self):
@@ -66,6 +75,7 @@ class ReunionsView(LoginRequiredMixin, ListView):
 
 
 class ReunionDetailView(LoginRequiredMixin, DetailView):
+    """Details of specific reunion"""
     model = Reunion
     template_name = 'student/reunion_details.html'
 
