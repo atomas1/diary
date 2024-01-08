@@ -7,7 +7,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>LMS - {% block title %}{% endblock %}</title>
+    <title>Diary for school - {% block title %}{% endblock %}</title>
     {% block styles %}
         <link rel="stylesheet" href="{% static 'styles/bootstrap.min.css' %}">
         <link rel="stylesheet" href="{% static 'styles/main.css' %}">
@@ -41,6 +41,7 @@
                     <p>Your role: STUDENT</p>
                     <p>Phone: {{ user.student.phone }}</p>
                 {% endif %}
+            <img style="width:100%;" src="{% static 'images/logo.jpg' %}" alt="Logo of School">
             {% endblock %}
         </div>
     </div>

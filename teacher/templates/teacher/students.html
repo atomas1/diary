@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Student|Reunion detail 2
+{% endblock %}
+{% block content %}
+    <h3>Students in current academic year:</h3>
+    <table class="table">
+
+        {% for level_number, data in students_by_level.items %}
+            <thead class="thead-dark">
+            <tr class="table-dark">
+                <th scope="col" colspan="3">LEVEL {{ data.level }}</th>
+            </tr>
+            <tr class="table-secondary">
+                <th scope="col" colspan="3">{{ lesson.topic }}</th>
+            </tr>
+            <tr>
+                <th>FIRST NAME</th>
+                <th>LAST NAME</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for student in data.students %}
+                <tr>
+                    <td>{{ student.user.first_name }}</td>
+                    <td>{{ student.user.last_name }}</td>
+                    <td><a href="{% url 'teacher:student-details' pk=student.id %}">
+                        <button class="btn btn-sm btn-warning">DETAILS</button>
+                    </a></td>
+                </tr>
+            {% endfor %}
+
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

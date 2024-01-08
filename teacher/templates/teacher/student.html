@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Student|Reunion detail 2
+{% endblock %}
+{% block content %}
+    <h3>Student {{ student.user.first_name }} {{ student.user.last_name }}</h3>
+    <table class="table">
+
+        {% for exam in exams %}
+            <thead class="thead-dark">
+            <tr class="table-dark">
+                <th scope="col" colspan="3">{{ exam.exam.item.name }}</th>
+            </tr>
+            <tr>
+                <th>PASSED?</th>
+                <th>RATING</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ exam.is_passed }}</td>
+                    <td>{{ exam.rating }}</td>
+                    <td></td>
+                </tr>
+
+        {% endfor %}
+                <tr>
+                <td colspan="3"><a href="{% url 'teacher:student-promote' pk=student.id %}">
+                        <button class="btn btn-sm btn-danger">PROMOTE TO THE NEXT LEVEL</button>
+                    </a></td>
+                </tr>
+        </tbody>
+    </table>
+
+{% endblock %}

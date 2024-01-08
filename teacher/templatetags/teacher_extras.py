@@ -19,7 +19,7 @@ def for_academic_year(students, year):
         'name')
     students = students.filter(academic_years__in=[current_academic_year])
     for student in students:
-        student.items_p=[]
+        student.items_p = []
         for item in items:
             not_present = Lesson.objects.filter(item=item).filter(
                 reunion__academic_year=current_academic_year).distinct().count() - Lesson.objects.filter(

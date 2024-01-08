@@ -4,6 +4,7 @@ from django.conf import settings
 
 class Student(models.Model):
     """school student model inherited from the user model"""
+
     class Confession(models.IntegerChoices):
         NOT_DEFINED = -1
         ROMAN_CATHOLIC = 0
@@ -48,15 +49,17 @@ class AcademicYear(models.Model):
 
 class Level(models.Model):
     """The school has three levels"""
+
     class LevelNumber(models.IntegerChoices):
         FIRST = 1
         SECOND = 2
         LAST = 3
 
     level_number = models.IntegerField(choices=LevelNumber.choices, default=1)
+    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE, related_name="levels")
 
     def __str__(self):
-        return f"{self.level_number}"
+        return f"{self.level_number} {self.academic_year}"
 
 
 class Item(models.Model):
